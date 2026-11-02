@@ -5,12 +5,24 @@ namespace Derevnya;
 internal sealed class MainForm : Form
 {
     private const int PollIntervalMs = 500;
+    private const int WorldIntervalMs = 33;
+    private const int WM_DPICHANGED = 0x02E0;
 
+    private readonly WorldState _state;
+    private readonly Supervisor _supervisor;
     private readonly List<string> _lines = new();
     private readonly object _linesSync = new();
-    private readonly NotifyIcon _tray;
     private readonly System.Windows.Forms.Timer _pollTimer;
+    private readonly System.Windows.Forms.Timer _worldTimer;
+    private readonly Font _font = new("Consolas", 11f);
+    private readonly Font _bigFont = new("Consolas", 18f, FontStyle.Bold);
+    private readonly Font _smallFont = new("Consolas", 9f);
+
     private bool _attached;
+    private bool _quiet;
+    private IntPtr _workerW = IntPtr.Zero;
+    private PauseReason _paused = PauseReason.None;
+    private Rectangle _tickRect;
 
     // Опрос иконок: раскладка принимается после двух одинаковых опросов подряд
     private string? _lastPolledSignature;
@@ -19,8 +31,13 @@ internal sealed class MainForm : Form
     private IconLayout? _accepted;
     private string? _lastError;
 
-    public MainForm()
+    public event Action? ExitRequested;
+
+    public MainForm(WorldState state, Supervisor supervisor)
     {
+        _state = state;
+        _supervisor = supervisor;
+
         Text = "Деревня";
         FormBorderStyle = FormBorderStyle.None;
         ShowInTaskbar = false;
@@ -29,60 +46,104 @@ internal sealed class MainForm : Form
         DoubleBuffered = true;
         KeyPreview = true;
 
-        var menu = new ContextMenuStrip();
-        menu.Items.Add("Выход", null, (_, _) => Close());
-        _tray = new NotifyIcon
-        {
-            Icon = SystemIcons.Application,
-            Text = "Деревня (шаг 2)",
-            ContextMenuStrip = menu,
-            Visible = true
-        };
+        _tickRect = new Rectangle((int)(Width / 3f), 370, 760, 60);
 
         _pollTimer = new System.Windows.Forms.Timer { Interval = PollIntervalMs };
         _pollTimer.Tick += (_, _) => PollIcons();
+
+        _worldTimer = new System.Windows.Forms.Timer { Interval = WorldIntervalMs };
+        _worldTimer.Tick += (_, _) => WorldTick();
 
         Logger.LineWritten += OnLogLine;
     }
 
     protected override bool ShowWithoutActivation => true;
 
-    protected override void OnShown(EventArgs e)
-    {
-        base.OnShown(e);
-        AttachToDesktop();
-    }
+    public IntPtr Hwnd => IsHandleCreated ? Handle : IntPtr.Zero;
+    public IntPtr WorkerW => _workerW;
+    public bool IsAlive => !IsDisposed && IsHandleCreated;
 
-    private void AttachToDesktop()
+    /// <summary>Прикрепляет окно к WorkerW (в первый раз или после пересоздания WorkerW).</summary>
+    public bool AttachTo(IntPtr workerW)
     {
-        Logger.Log("Ищу WorkerW...");
-        IntPtr workerW = WallpaperHost.FindWorkerW(Logger.Log);
-        if (workerW == IntPtr.Zero)
+        if (!IsAlive)
         {
-            Logger.Log("ОШИБКА: WorkerW не найден, окно остаётся обычным (закрыть: Esc или значок в трее)");
-            return;
+            return false;
         }
 
+        _workerW = workerW;
         _attached = WallpaperHost.Attach(Handle, workerW, Logger.Log);
-        Logger.Log(_attached
-            ? "Окно прикреплено за иконки"
-            : "ОШИБКА: прикрепить окно не удалось");
-        Invalidate();
+        _tickRect = new Rectangle((int)(Width / 3f), 370, 760, 60);
 
         if (_attached)
         {
-            Logger.Log($"Опрос иконок каждые {PollIntervalMs} мс, принятие после двух одинаковых опросов");
+            // Раскладку заново читаем после каждого прикрепления
+            _lastPolledSignature = null;
+            _samePollCount = 0;
+            _acceptedSignature = null;
+            _accepted = null;
             _pollTimer.Start();
+            _worldTimer.Start();
         }
+
+        Invalidate();
+        return _attached;
+    }
+
+    /// <summary>Вызывается надсмотрщиком каждые 0,5 с: сообщает текущие причины паузы.</summary>
+    public void SetPaused(PauseReason reasons)
+    {
+        if (reasons == _paused)
+        {
+            return;
+        }
+
+        _paused = reasons;
+        if (IsAlive)
+        {
+            Invalidate(); // один раз, чтобы показать или убрать надпись о паузе
+        }
+    }
+
+    /// <summary>Уничтожает окно без запроса на выход, даже если Windows уже разрушила его дескриптор.</summary>
+    public void DestroyQuietly()
+    {
+        _quiet = true;
+        try
+        {
+            _pollTimer.Stop();
+            _worldTimer.Stop();
+            Logger.LineWritten -= OnLogLine;
+            Dispose();
+        }
+        catch (Exception ex)
+        {
+            Logger.Log($"Предупреждение при уничтожении окна: {ex.Message}");
+        }
+    }
+
+    private void WorldTick()
+    {
+        if (_paused != PauseReason.None || !IsAlive)
+        {
+            return; // пауза: без расчёта и отрисовки
+        }
+
+        _state.Ticks++;
+        Invalidate(_tickRect);
     }
 
     private void PollIcons()
     {
+        if (_paused != PauseReason.None || !IsAlive)
+        {
+            return;
+        }
+
         IconLayout? layout = IconReader.Read(Handle, out string? error);
 
         if (layout == null)
         {
-            // Одну и ту же ошибку пишем в журнал только один раз
             if (error != _lastError)
             {
                 Logger.Log($"ОШИБКА опроса иконок: {error}");
@@ -150,11 +211,16 @@ internal sealed class MainForm : Form
             }
         }
 
+        if (_paused != PauseReason.None)
+        {
+            return; // во время паузы не перерисовываем
+        }
+
         try
         {
             if (IsHandleCreated && !IsDisposed)
             {
-                BeginInvoke(new Action(Invalidate));
+                BeginInvoke(new Action(() => { if (IsAlive) Invalidate(); }));
             }
         }
         catch
@@ -176,18 +242,16 @@ internal sealed class MainForm : Form
             g.FillRectangle(brush, ClientRectangle);
         }
 
-        // Принятые прямоугольники иконок: красная рамка и номер
         if (_accepted != null)
         {
             using var fill = new SolidBrush(Color.FromArgb(50, 255, 0, 0));
             using var pen = new Pen(Color.Red, 2f);
-            using var small = new Font("Consolas", 9f);
             for (int i = 0; i < _accepted.Items.Count; i++)
             {
                 Rectangle b = _accepted.Items[i].Bounds;
                 g.FillRectangle(fill, b);
                 g.DrawRectangle(pen, b);
-                g.DrawString($"#{i}", small, Brushes.Yellow, b.Left + 2, b.Top + 2);
+                g.DrawString($"#{i}", _smallFont, Brushes.Yellow, b.Left + 2, b.Top + 2);
             }
         }
 
@@ -197,17 +261,35 @@ internal sealed class MainForm : Form
             snapshot = _lines.ToArray();
         }
 
-        using var font = new Font("Consolas", 11f);
         float x = Width / 3f;
         float y = 30f;
-        string header = _attached ? "Деревня: окно за иконками" : "Деревня: окно НЕ прикреплено";
-        g.DrawString(header, font, Brushes.White, x, y);
-        y += font.Height * 1.5f;
+        string header = !_attached
+            ? "Деревня: окно НЕ прикреплено"
+            : _paused != PauseReason.None
+                ? "Деревня: ПАУЗА (" + Supervisor.Describe(_paused) + ")"
+                : "Деревня: окно за иконками";
+        g.DrawString(header, _font, Brushes.White, x, y);
+        y += _font.Height * 1.5f;
         foreach (string line in snapshot)
         {
-            g.DrawString(line, font, Brushes.White, x, y);
-            y += font.Height + 2;
+            g.DrawString(line, _font, Brushes.White, x, y);
+            y += _font.Height + 2;
         }
+
+        // Счётчик мира: если он растёт, мир работает; если замер, пауза
+        string tickText = _paused != PauseReason.None
+            ? $"Тик мира: {_state.Ticks}  (пауза)"
+            : $"Тик мира: {_state.Ticks}";
+        g.DrawString(tickText, _bigFont, Brushes.Yellow, _tickRect.Left, _tickRect.Top);
+    }
+
+    protected override void WndProc(ref Message m)
+    {
+        if (m.Msg == WM_DPICHANGED)
+        {
+            _supervisor.NotifyDpiChanged();
+        }
+        base.WndProc(ref m);
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
@@ -215,17 +297,32 @@ internal sealed class MainForm : Form
         base.OnKeyDown(e);
         if (e.KeyCode == Keys.Escape)
         {
-            Close();
+            ExitRequested?.Invoke();
         }
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e)
     {
-        _pollTimer.Stop();
-        Logger.LineWritten -= OnLogLine;
-        _tray.Visible = false;
-        _tray.Dispose();
-        Logger.Log("Закрытие окна");
+        if (!_quiet)
+        {
+            // Закрывать окно может только WorldContext (через «Выход»)
+            e.Cancel = true;
+            ExitRequested?.Invoke();
+            return;
+        }
         base.OnFormClosing(e);
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _pollTimer.Dispose();
+            _worldTimer.Dispose();
+            _font.Dispose();
+            _bigFont.Dispose();
+            _smallFont.Dispose();
+        }
+        base.Dispose(disposing);
     }
 }

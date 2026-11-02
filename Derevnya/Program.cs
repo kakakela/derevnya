@@ -16,7 +16,7 @@ internal static class Program
 
         try
         {
-            Application.Run(new MainForm());
+            Application.Run(new WorldContext());
         }
         catch (Exception ex)
         {
@@ -24,7 +24,7 @@ internal static class Program
         }
 
         WallpaperHost.RestoreWallpaper(Logger.Log);
-        
+
         Logger.Log("Программа завершена");
     }
 }
