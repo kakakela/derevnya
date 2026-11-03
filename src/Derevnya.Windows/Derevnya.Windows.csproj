@@ -1,9 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RootNamespace>Derevnya</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Derevnya.Core\Derevnya.Core.csproj" />
+    <ProjectReference Include="..\Derevnya.Render\Derevnya.Render.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Logger и WorldState переезжают в ядро: подключаем его пространство имён во всём слое Windows -->
+    <Using Include="Derevnya.Core" />
+  </ItemGroup>
 
 </Project>

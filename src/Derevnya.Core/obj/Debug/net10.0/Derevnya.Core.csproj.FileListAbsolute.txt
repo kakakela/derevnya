@@ -1,0 +1,12 @@
+C:\Derevnya\src\Derevnya.Core\bin\Debug\net10.0\Derevnya.Core.deps.json
+C:\Derevnya\src\Derevnya.Core\bin\Debug\net10.0\Derevnya.Core.dll
+C:\Derevnya\src\Derevnya.Core\bin\Debug\net10.0\Derevnya.Core.pdb
+C:\Derevnya\src\Derevnya.Core\obj\Debug\net10.0\Derevnya.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Derevnya\src\Derevnya.Core\obj\Debug\net10.0\Derevnya.Core.AssemblyInfoInputs.cache
+C:\Derevnya\src\Derevnya.Core\obj\Debug\net10.0\Derevnya.Core.AssemblyInfo.cs
+C:\Derevnya\src\Derevnya.Core\obj\Debug\net10.0\Derevnya.Core.csproj.CoreCompileInputs.cache
+C:\Derevnya\src\Derevnya.Core\obj\Debug\net10.0\Derevnya.Core.sourcelink.json
+C:\Derevnya\src\Derevnya.Core\obj\Debug\net10.0\Derevnya.Core.dll
+C:\Derevnya\src\Derevnya.Core\obj\Debug\net10.0\refint\Derevnya.Core.dll
+C:\Derevnya\src\Derevnya.Core\obj\Debug\net10.0\Derevnya.Core.pdb
+C:\Derevnya\src\Derevnya.Core\obj\Debug\net10.0\ref\Derevnya.Core.dll

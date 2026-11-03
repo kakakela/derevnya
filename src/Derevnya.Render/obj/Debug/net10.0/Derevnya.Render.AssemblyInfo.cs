@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Derevnya.Render")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cb612c54ceee00675784fd2ac96885bcb6d2b13c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3afe962ea6c99359cb6d857534a4eb6d077ed6ee")]
 [assembly: System.Reflection.AssemblyProductAttribute("Derevnya.Render")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Derevnya.Render")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

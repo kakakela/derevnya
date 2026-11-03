@@ -1,10 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>Derevnya</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Derevnya.Windows\Derevnya.Windows.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Derevnya.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Таблицы данных из C:\Derevnya\data копируются рядом с программой -->
+    <None Include="..\..\data\**\*.json" LinkBase="data" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 
 </Project>

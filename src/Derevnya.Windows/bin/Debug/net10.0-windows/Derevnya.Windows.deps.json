@@ -1,0 +1,56 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "Derevnya.Windows/1.0.0": {
+        "dependencies": {
+          "Derevnya.Core": "1.0.0",
+          "Derevnya.Render": "1.0.0"
+        },
+        "runtime": {
+          "Derevnya.Windows.dll": {}
+        }
+      },
+      "Derevnya.Core/1.0.0": {
+        "runtime": {
+          "Derevnya.Core.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Derevnya.Render/1.0.0": {
+        "dependencies": {
+          "Derevnya.Core": "1.0.0"
+        },
+        "runtime": {
+          "Derevnya.Render.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Derevnya.Windows/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Derevnya.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Derevnya.Render/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

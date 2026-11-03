@@ -1,0 +1,8 @@
+{
+  "stepsPerSecond": 10,
+  "framesPerSecond": 30,
+  "statsLogIntervalSeconds": 10,
+  "tileSize": 32,
+  "seed": 12345,
+  "debugOverlay": false
+}

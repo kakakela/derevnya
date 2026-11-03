@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\derevnya\\src\\Derevnya.Core\\Derevnya.Core.csproj": {}
+    "C:\\Derevnya\\src\\Derevnya.Core\\Derevnya.Core.csproj": {}
   },
   "projects": {
-    "C:\\derevnya\\src\\Derevnya.Core\\Derevnya.Core.csproj": {
+    "C:\\Derevnya\\src\\Derevnya.Core\\Derevnya.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\derevnya\\src\\Derevnya.Core\\Derevnya.Core.csproj",
+        "projectUniqueName": "C:\\Derevnya\\src\\Derevnya.Core\\Derevnya.Core.csproj",
         "projectName": "Derevnya.Core",
-        "projectPath": "C:\\derevnya\\src\\Derevnya.Core\\Derevnya.Core.csproj",
+        "projectPath": "C:\\Derevnya\\src\\Derevnya.Core\\Derevnya.Core.csproj",
         "packagesPath": "C:\\Users\\angieliz\\.nuget\\packages\\",
-        "outputPath": "C:\\derevnya\\src\\Derevnya.Core\\obj\\",
+        "outputPath": "C:\\Derevnya\\src\\Derevnya.Core\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\angieliz\\AppData\\Roaming\\NuGet\\NuGet.Config"
