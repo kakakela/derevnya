@@ -1,4 +1,5 @@
 using System.Drawing.Drawing2D;
+using Derevnya.Render;
 
 namespace Derevnya;
 
@@ -8,6 +9,7 @@ internal sealed class MainForm : Form
     private const int WM_DPICHANGED = 0x02E0;
 
     private readonly WorldState _state;
+    private readonly World _world;
     private readonly Supervisor _supervisor;
     private readonly List<string> _lines = new();
     private readonly object _linesSync = new();
@@ -30,11 +32,17 @@ internal sealed class MainForm : Form
     private IconLayout? _accepted;
     private string? _lastError;
 
+    // Что уже превращено в маску препятствий
+    private WorldGrid? _appliedGrid;
+    private string? _appliedSignature;
+    private Rectangle _appliedWorkArea;
+
     public event Action? ExitRequested;
 
-    public MainForm(WorldState state, Supervisor supervisor)
+    public MainForm(WorldState state, World world, Supervisor supervisor)
     {
         _state = state;
+        _world = world;
         _supervisor = supervisor;
 
         Text = "Деревня";
@@ -73,7 +81,8 @@ internal sealed class MainForm : Form
 
         if (_attached)
         {
-            // Раскладку заново читаем после каждого прикрепления
+            // Раскладку заново читаем после каждого прикрепления;
+            // прежняя маска остаётся в мире, пока не будет принята новая раскладка
             _lastPolledSignature = null;
             _samePollCount = 0;
             _acceptedSignature = null;
@@ -198,6 +207,59 @@ internal sealed class MainForm : Form
             LogAccepted(layout);
             Invalidate();
         }
+
+        // Маска строится только из принятой раскладки (и пересчитывается,
+        // если изменилась рабочая область или мир был построен заново)
+        ApplyMaskIfNeeded();
+    }
+
+    private void ApplyMaskIfNeeded()
+    {
+        if (_accepted == null)
+        {
+            return;
+        }
+
+        WorldGrid grid = _world.Grid;
+        // Маска строится только при том разрешении, под которое создан мир.
+        // При смене разрешения пауза включается с задержкой до 0,5 с: за это время маску не трогаем.
+        if (Supervisor.CurrentSize() != grid.ScreenSize)
+        {
+            return;
+        }
+        Rectangle workArea = Screen.PrimaryScreen?.WorkingArea ?? new Rectangle(Point.Empty, grid.ScreenSize);
+
+        if (ReferenceEquals(grid, _appliedGrid)
+            && _acceptedSignature == _appliedSignature
+            && workArea == _appliedWorkArea)
+        {
+            return;
+        }
+
+        var icons = new List<Rectangle>(_accepted.Items.Count);
+        foreach (IconInfo item in _accepted.Items)
+        {
+            icons.Add(item.Bounds);
+        }
+
+        ObstacleMask mask = grid.SetObstacles(icons, workArea);
+        _appliedGrid = grid;
+        _appliedSignature = _acceptedSignature;
+        _appliedWorkArea = workArea;
+
+        Logger.Log(
+            $"МАСКА: версия {mask.Version}, заблокировано {mask.BlockedCount} из {grid.TilesX * grid.TilesY} тайлов " +
+            $"(мир {grid.TilesX}x{grid.TilesY}), рабочая область x={workArea.Left} y={workArea.Top} " +
+            $"w={workArea.Width} h={workArea.Height}");
+
+        for (int i = 0; i < _accepted.Items.Count; i++)
+        {
+            IconInfo item = _accepted.Items[i];
+            Rectangle t = grid.TilesOf(item.Bounds);
+            Logger.Log($"  иконка #{i} '{item.Name}': тайлы x={t.Left} y={t.Top} w={t.Width} h={t.Height}");
+        }
+
+        Invalidate();
     }
 
     private static void LogAccepted(IconLayout layout)
@@ -217,7 +279,7 @@ internal sealed class MainForm : Form
         }
     }
 
-    private void OnLogLine(string line)
+        private void OnLogLine(string line)
     {
         lock (_linesSync)
         {
@@ -259,14 +321,18 @@ internal sealed class MainForm : Form
             g.FillRectangle(brush, ClientRectangle);
         }
 
+        // Отладочная картинка: сетка тайлов и маска препятствий
+        if (_world.Config.DebugOverlay)
+        {
+            DebugOverlay.Draw(g, _world.Grid);
+        }
+
         if (_accepted != null)
         {
-            using var fill = new SolidBrush(Color.FromArgb(50, 255, 0, 0));
             using var pen = new Pen(Color.Red, 2f);
             for (int i = 0; i < _accepted.Items.Count; i++)
             {
                 Rectangle b = _accepted.Items[i].Bounds;
-                g.FillRectangle(fill, b);
                 g.DrawRectangle(pen, b);
                 g.DrawString($"#{i}", _smallFont, Brushes.Yellow, b.Left + 2, b.Top + 2);
             }

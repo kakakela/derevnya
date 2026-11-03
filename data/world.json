@@ -4,5 +4,5 @@
   "statsLogIntervalSeconds": 10,
   "tileSize": 32,
   "seed": 12345,
-  "debugOverlay": false
+  "debugOverlay": true
 }

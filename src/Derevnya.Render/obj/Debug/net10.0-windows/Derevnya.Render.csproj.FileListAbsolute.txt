@@ -1,0 +1,16 @@
+C:\Derevnya\src\Derevnya.Render\bin\Debug\net10.0-windows\Derevnya.Render.deps.json
+C:\Derevnya\src\Derevnya.Render\bin\Debug\net10.0-windows\Derevnya.Render.dll
+C:\Derevnya\src\Derevnya.Render\bin\Debug\net10.0-windows\Derevnya.Render.pdb
+C:\Derevnya\src\Derevnya.Render\bin\Debug\net10.0-windows\Derevnya.Core.dll
+C:\Derevnya\src\Derevnya.Render\bin\Debug\net10.0-windows\Derevnya.Core.pdb
+C:\Derevnya\src\Derevnya.Render\obj\Debug\net10.0-windows\Derevnya.Render.csproj.AssemblyReference.cache
+C:\Derevnya\src\Derevnya.Render\obj\Debug\net10.0-windows\Derevnya.Render.GeneratedMSBuildEditorConfig.editorconfig
+C:\Derevnya\src\Derevnya.Render\obj\Debug\net10.0-windows\Derevnya.Render.AssemblyInfoInputs.cache
+C:\Derevnya\src\Derevnya.Render\obj\Debug\net10.0-windows\Derevnya.Render.AssemblyInfo.cs
+C:\Derevnya\src\Derevnya.Render\obj\Debug\net10.0-windows\Derevnya.Render.csproj.CoreCompileInputs.cache
+C:\Derevnya\src\Derevnya.Render\obj\Debug\net10.0-windows\Derevnya.Render.sourcelink.json
+C:\Derevnya\src\Derevnya.Render\obj\Debug\net10.0-windows\Derevnya.5D2918D2.Up2Date
+C:\Derevnya\src\Derevnya.Render\obj\Debug\net10.0-windows\Derevnya.Render.dll
+C:\Derevnya\src\Derevnya.Render\obj\Debug\net10.0-windows\refint\Derevnya.Render.dll
+C:\Derevnya\src\Derevnya.Render\obj\Debug\net10.0-windows\Derevnya.Render.pdb
+C:\Derevnya\src\Derevnya.Render\obj\Debug\net10.0-windows\ref\Derevnya.Render.dll

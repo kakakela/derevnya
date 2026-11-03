@@ -7,6 +7,7 @@ internal sealed class WorldContext : ApplicationContext
 
     private readonly WorldConfig _config;
     private readonly WorldState _state;
+    private readonly World _world;
     private readonly Simulation _simulation;
     private readonly WorldLoop _loop;
     private readonly Supervisor _supervisor;
@@ -25,6 +26,7 @@ internal sealed class WorldContext : ApplicationContext
 
         _config = WorldConfig.Load();
         _state = new WorldState();
+        _world = new World(_config, Supervisor.CurrentSize());
         _simulation = new Simulation(_state);
         _loop = new WorldLoop(_simulation, _config);
         _loop.FrameCallback = () => _form?.RequestFrame();
@@ -164,7 +166,7 @@ internal sealed class WorldContext : ApplicationContext
         {
             Logger.Log("Создаю окно мира заново");
             form?.DestroyQuietly();
-            form = new MainForm(_state, _supervisor);
+            form = new MainForm(_state, _world, _supervisor);
             form.ExitRequested += ExitWorld;
             _form = form;
             form.Show();
@@ -181,6 +183,7 @@ internal sealed class WorldContext : ApplicationContext
     {
         _state.Reset();
         _supervisor.ResetBaseline();
+        _world.Rebuild(Supervisor.CurrentSize());
         Logger.Log("Команда: мир перезапущен (шаги обнулены, текущее разрешение принято за базовое)");
     }
 
