@@ -3,7 +3,7 @@
 internal static class Program
 {
     [STAThread]
-    private static void Main()
+    private static void Main(string[] args)
     {
         Logger.Init();
 
@@ -14,9 +14,18 @@ internal static class Program
 
         ApplicationConfiguration.Initialize();
 
+        bool bench = args.Contains("--bench");
+
         try
         {
-            Application.Run(new WorldContext());
+            if (bench)
+            {
+                Application.Run(new BenchForm());
+            }
+            else
+            {
+                Application.Run(new WorldContext());
+            }
         }
         catch (Exception ex)
         {
