@@ -1,0 +1,15 @@
+C:\derevnya\Derevnya\bin\Release\net10.0-windows\Derevnya.exe
+C:\derevnya\Derevnya\bin\Release\net10.0-windows\Derevnya.deps.json
+C:\derevnya\Derevnya\bin\Release\net10.0-windows\Derevnya.runtimeconfig.json
+C:\derevnya\Derevnya\bin\Release\net10.0-windows\Derevnya.dll
+C:\derevnya\Derevnya\bin\Release\net10.0-windows\Derevnya.pdb
+C:\derevnya\Derevnya\obj\Release\net10.0-windows\Derevnya.GeneratedMSBuildEditorConfig.editorconfig
+C:\derevnya\Derevnya\obj\Release\net10.0-windows\Derevnya.AssemblyInfoInputs.cache
+C:\derevnya\Derevnya\obj\Release\net10.0-windows\Derevnya.AssemblyInfo.cs
+C:\derevnya\Derevnya\obj\Release\net10.0-windows\Derevnya.csproj.CoreCompileInputs.cache
+C:\derevnya\Derevnya\obj\Release\net10.0-windows\Derevnya.sourcelink.json
+C:\derevnya\Derevnya\obj\Release\net10.0-windows\Derevnya.dll
+C:\derevnya\Derevnya\obj\Release\net10.0-windows\refint\Derevnya.dll
+C:\derevnya\Derevnya\obj\Release\net10.0-windows\Derevnya.pdb
+C:\derevnya\Derevnya\obj\Release\net10.0-windows\Derevnya.genruntimeconfig.cache
+C:\derevnya\Derevnya\obj\Release\net10.0-windows\ref\Derevnya.dll

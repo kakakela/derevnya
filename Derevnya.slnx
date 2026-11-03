@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Derevnya.Core/Derevnya.Core.csproj" />
+    <Project Path="src/Derevnya.Render/Derevnya.Render.csproj" />
+    <Project Path="src/Derevnya.Windows/Derevnya.Windows.csproj" />
+    <Project Path="src/Derevnya/Derevnya.csproj" />
+  </Folder>
+</Solution>
